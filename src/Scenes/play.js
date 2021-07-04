@@ -6,11 +6,14 @@ class Play extends Phaser.Scene {
         this.load.image('tempBackround','./assets/tempAssets/tempbackround.png');
         this.load.image('turkey','./assets/tempAssets/tempTurk.png');
         this.load.image('stick','./assets/tempAssets/tempstick.png');
+        this.load.spritesheet('turkeyRun', './assets/turkeys.png', {frameWidth: 20, frameHeight: 20, startFrame: 0, endFrame: 1});
+        //this.load.spritesheet('turkeyJump', './assets/turkeys.png', {frameWidth: 20, frameHeight: 20, startFrame: 2, endFrame: 3});
+        this.load.spritesheet('turkeyFlap', './assets/turkeys.png', {frameWidth: 20, frameHeight: 20, startFrame: 3, endFrame: 4});
     }
     create(){
         this.gameOver=false;
         this.backround = this.add.tileSprite(0, 0, 1280, 480, 'tempBackround').setOrigin(0, 0);
-        this.turkey = new Turkey(this, borderPadding+borderUISize, game.config.height/2, 'turkey').setOrigin(0.5, 0);
+        this.turkey = new Turkey(this, borderPadding+borderUISize, game.config.height/2, 'turkeyRun').setOrigin(0.5, 0);
 
         this.stick1= new Stick(this, borderPadding+borderUISize, game.config.height/2+5, 'stick', 0).setOrigin(0, 0);
         this.stick2= new Stick(this, game.config.width * (2/6), game.config.height *(2/6), 'stick', 0).setOrigin(0, 0);
@@ -41,6 +44,19 @@ class Play extends Phaser.Scene {
         this.clockRight = this.add.text(game.config.width-borderUISize-borderPadding, borderUISize+borderPadding, this.clock , clockConfig).setOrigin(0.5);
         this.score = 0;
         this.scoreLeft = this.add.text(borderUISize+borderPadding,borderUISize+borderPadding, this.score, clockConfig).setOrigin(0.5);
+
+        // animation configs
+        this.anims.create({
+            key: 'run',
+            frames: this.anims.generateFrameNumbers('turkeyRun', { start: 0, end: 1, first: 0}),
+            frameRate: 30
+        });
+        this.anims.create({
+            key: 'jump',
+            frames: this.anims.generateFrameNumbers('turkeyFlap', { start: 3, end: 4, first: 0}),
+            frameRate: 30
+        });
+
     }
     update(){
         if(!this.gameOver){
@@ -54,9 +70,11 @@ class Play extends Phaser.Scene {
                 this.checkGrounded(this.turkey,this.stick3)||this.checkGrounded(this.turkey,this.stick4)||
                 this.checkGrounded(this.turkey,this.stick5)||this.checkGrounded(this.turkey,this.stick6)){
                     this.turkey.touchingGround=true;
+                    this.turkey.anims.play('run');
             }
             else{
                 this.turkey.touchingGround=false;
+                this.turkey.anims.play('jump');
             }
             this.turkey.update();
             this.stick1.update();
